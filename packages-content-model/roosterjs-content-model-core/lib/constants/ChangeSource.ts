@@ -56,4 +56,8 @@ export const ChangeSource = {
      * Data of this event will be the key code number
      */
     Keyboard: 'Keyboard',
+    /**
+     * Logical root changed
+     */
+    LogicalRootChanged: 'LogicalRootChanged',
 };

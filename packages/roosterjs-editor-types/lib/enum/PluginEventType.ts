@@ -129,4 +129,11 @@ export const enum PluginEventType {
      * This is only used by Content Model editing
      */
     BeforeKeyboardEditing = 23,
+
+    /**
+     * EXPERIMENTAL FEATURE
+     * Editor content is about to be changed by keyboard event.
+     * This is only used by Content Model editing
+     */
+    SnapshotLogicalRoot = 24,
 }

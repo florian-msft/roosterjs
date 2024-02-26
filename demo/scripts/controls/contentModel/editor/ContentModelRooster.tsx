@@ -5,6 +5,7 @@ import { EditorAdapter, EditorAdapterOptions } from 'roosterjs-editor-adapter';
 import { EditorOptions, EditorPlugin, IEditor } from 'roosterjs-content-model-types';
 import { useTheme } from '@fluentui/react/lib/Theme';
 import type { EditorPlugin as LegacyEditorPlugin } from 'roosterjs-editor-types';
+import { insertEntity } from 'roosterjs-content-model-api';
 
 /**
  * Properties for Rooster react component
@@ -49,6 +50,31 @@ export default function ContentModelRooster(props: ContentModelRoosterProps) {
     React.useEffect(() => {
         if (editorDiv.current) {
             editor.current = (editorCreator || defaultEditorCreator)(editorDiv.current, props);
+
+            const entity = insertEntity(editor.current, 'Sample', true, 'focus', {
+                skipUndoSnapshot: true,
+            });
+            entity.wrapper.innerHTML = `
+                entity
+                <br />
+                sample content
+                <div style="border:1px solid green;padding:10px;box-sizing:border-box" class="editable" tabindex="0">
+                    this should be editable
+                </div>
+            `;
+            entity.wrapper.style.border = '1px solid red';
+            entity.wrapper.style.padding = '10px';
+            entity.wrapper.style.boxSizing = 'border-box';
+
+            entity.wrapper.querySelector('.editable').addEventListener('focus', e => {
+                console.log('inner focused');
+                editor.current.setLogicalRoot(e.target as HTMLDivElement);
+            });
+
+            editorDiv.current.addEventListener('focus', () => {
+                console.log('outer focused');
+                editor.current.setLogicalRoot(null);
+            });
         }
 
         if (focusOnInit) {

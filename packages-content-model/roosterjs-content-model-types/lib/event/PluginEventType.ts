@@ -122,4 +122,11 @@ export type PluginEventType =
      * Editor content is about to be changed by keyboard event.
      * This is only used by Content Model editing
      */
-    | 'beforeKeyboardEditing';
+    | 'beforeKeyboardEditing'
+
+    /**
+     * EXPERIMENTAL FEATURE
+     * A snapshot of logical root is about to be taken. Entities should return an entity state they wish to restore.
+     * This is only used by Content Model editing
+     */
+    | 'snapshotLogicalRoot';

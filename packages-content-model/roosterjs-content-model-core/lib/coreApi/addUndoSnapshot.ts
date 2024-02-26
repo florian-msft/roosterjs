@@ -1,3 +1,4 @@
+import { SnapshotLogicalRootEvent } from 'roosterjs-content-model-types/lib/event/SnapshotLogicalRootEvent';
 import { createSnapshotSelection } from '../utils/createSnapshotSelection';
 import type { AddUndoSnapshot, Snapshot } from 'roosterjs-content-model-types';
 
@@ -11,19 +12,30 @@ import type { AddUndoSnapshot, Snapshot } from 'roosterjs-content-model-types';
  * when undo/redo to this snapshot
  */
 export const addUndoSnapshot: AddUndoSnapshot = (core, canUndoByBackspace, entityStates) => {
-    const { lifecycle, contentDiv, undo } = core;
+    const { lifecycle, logicalRoot, physicalRoot, undo } = core;
     let snapshot: Snapshot | null = null;
 
     if (!lifecycle.shadowEditFragment) {
         // Need to create snapshot selection before retrieve innerHTML since HTML can be changed during creating selection when normalize table
         const selection = createSnapshotSelection(core);
-        const html = contentDiv.innerHTML;
+        const html = physicalRoot.innerHTML;
+
+        if (!entityStates && core.physicalRoot !== core.logicalRoot) {
+            const event = <SnapshotLogicalRootEvent>{
+                eventType: 'snapshotLogicalRoot',
+                logicalRoot,
+                entityStates: [],
+            };
+            core.api.triggerEvent(core, event, false);
+            entityStates = event.entityStates;
+        }
 
         snapshot = {
             html,
             entityStates,
             isDarkMode: !!lifecycle.isDarkMode,
             selection,
+            // logical root
         };
 
         undo.snapshotsManager.addSnapshot(snapshot, !!canUndoByBackspace);
